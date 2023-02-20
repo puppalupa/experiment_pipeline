@@ -12,7 +12,7 @@ import time
 logger = cfg.logger
 start_time = time.time()
 
-# скачайте отдельно https://drive.google.com/file/d/14Ftj8iSt3ysfNi3889Dg-q78h-E_iaI4/view?usp=sharing
+# скачайте отдельно https://drive.google.com/file/d/1f-HM6v5HQFrQ8Rn8DmWz9G4NF4uTbo4x/view?usp=share_link
 # df = pd.read_parquet(f'data/parquet/df.parquet')
 
 # Мини-версия таблицы с данными по эксперименту, количество строк = 10000

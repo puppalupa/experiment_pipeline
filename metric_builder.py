@@ -18,33 +18,58 @@ def _load_yaml_preset(preset="default"):
 
 
 class Metric:
-    def __init__(self, metric_config):
-        self.name = metric_config.get("name", config.DEFAULT_VALUE)
-        self.type = metric_config.get("type", config.DEFAULT_METRIC_TYPE)
-        self.level = metric_config.get("level", config.DEFAULT_UNIT_LEVEL)
-        self.estimator = metric_config.get("estimator", config.DEFAULT_ESTIMATOR)
-        self.numerator = metric_config.get("numerator", config.DEFAULT_VALUE)
-        self.numerator_aggregation_field = self.numerator.get("aggregation_field", config.DEFAULT_VALUE)
-        self.denominator = metric_config.get("denominator", config.DEFAULT_VALUE)
-        self.denominator_aggregation_field = self.denominator.get("aggregation_field", config.DEFAULT_VALUE)
-        numerator_aggregation_function = self.numerator.get("aggregation_function", config.DEFAULT_VALUE)
-        denominator_aggregation_function = self.denominator.get("aggregation_function", config.DEFAULT_VALUE)
-        self.numerator_aggregation_function = self._map_aggregation_function(numerator_aggregation_function)
-        self.denominator_aggregation_function = self._map_aggregation_function(denominator_aggregation_function)
+    def __init__(self, metric_config: dict):
+        self._config = metric_config
+
+    @property
+    def name(self) -> str:
+        return self._config.get("name", "default_value")
+
+    @property
+    def type(self) -> str:
+        return self._config.get("type", "default_metric_type")
+
+    @property
+    def level(self) -> str:
+        return self._config.get("level", "default_unit_level")
+
+    @property
+    def estimator(self) -> str:
+        return self._config.get("estimator", "default_estimator")
+
+    @property
+    def numerator(self) -> dict:
+        return self._config.get("numerator", {"aggregation_field": "default_value"})
+
+    @property
+    def denominator(self) -> dict:
+        return self._config.get("denominator", {"aggregation_field": "default_value"})
+
+    @property
+    def numerator_aggregation_field(self) -> str:
+        return self.numerator.get("aggregation_field", "default_value")
+
+    @property
+    def denominator_aggregation_field(self) -> str:
+        return self.denominator.get("aggregation_field", "default_value")
+
+    @property
+    def numerator_aggregation_function(self) -> callable:
+        return self._map_aggregation_function(self.numerator.get("aggregation_function"))
+
+    @property
+    def denominator_aggregation_function(self) -> callable:
+        return self._map_aggregation_function(self.denominator.get("aggregation_function"))
 
     @staticmethod
-    def _map_aggregation_function(aggregation_function):
+    def _map_aggregation_function(aggregation_function: str) -> callable:
         mappings = {
             "count_distinct": pd.Series.nunique,
             "sum": np.sum
         }
-        if aggregation_function == config.DEFAULT_VALUE:
-            raise ValueError("No aggregation_function found")
-
-        agg_func = mappings[aggregation_function]
-        if aggregation_function not in mappings.keys():
+        if aggregation_function not in mappings:
             raise ValueError(f"{aggregation_function} not found in mappings")
-        return agg_func
+        return mappings[aggregation_function]
 
 
 class CalculateMetric:

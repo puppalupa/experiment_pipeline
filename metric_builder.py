@@ -7,7 +7,7 @@ from yaml.loader import SafeLoader
 from os import listdir
 
 
-def _load_yaml_preset(preset="default"):
+def _load_yaml_preset(preset="todo"):
     preset_path = config.PATH_METRIC_CONFIGS + preset
     metrics_to_load = listdir(preset_path)
     metrics = []
@@ -60,6 +60,14 @@ class Metric:
     @property
     def denominator_aggregation_function(self) -> callable:
         return self._map_aggregation_function(self.denominator.get("aggregation_function"))
+
+    @property
+    def numerator_conditions(self):
+        return self._config.get("numerator_conditions", [])
+
+    @property
+    def denominator_conditions(self):
+        return self._config.get("denominator_conditions", [])
 
     @staticmethod
     def _map_aggregation_function(aggregation_function: str) -> callable:
